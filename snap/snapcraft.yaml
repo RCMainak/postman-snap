@@ -1,0 +1,45 @@
+name: postman
+version: 6.1.2
+summary: Postman Makes API Development Simple.
+description: |
+  Postman Makes API Development Simple. Developers use Postman to
+  build modern software for the API-first world. Postman is used by
+  5 million developers and more than 100,000 companies to access 130
+  million APIs every month.
+
+grade: stable
+confinement: classic
+
+apps:
+  postman:
+    command: opt/Postman/app/Postman
+
+parts:
+  postman:
+    plugin: nil
+    override-build: |
+      snapcraftctl build
+      # Download the latest tarball
+      ARCHITECTURE=$(dpkg --print-architecture)
+      if [ "${ARCHITECTURE}" = "amd64" ]; then
+      BUILD="64"
+      elif [ "${ARCHITECTURE}" = "i386" ]; then
+      BUILD="32"
+      else
+      echo "ERROR! Postman tarballs are only available for x64 and x32. Failing the build here."
+      exit 1
+      fi
+
+      TARBALL="Postman-linux-x${BUILD}-${SNAPCRAFT_PROJECT_VERSION}.tar.gz"
+      TARBALL_URL="https://dl.pstmn.io/download/version/${SNAPCRAFT_PROJECT_VERSION}/linux${BUILD}"
+      echo "Downloading ${TARBALL_URL}..."
+      wget --quiet "${TARBALL_URL}" -O "${SNAPCRAFT_PART_INSTALL}/${TARBALL}"
+      echo "Unpacking ${TARBALL}..."
+      mkdir -p "${SNAPCRAFT_PART_INSTALL}/opt"
+      tar xf "${SNAPCRAFT_PART_INSTALL}/${TARBALL}" -C "${SNAPCRAFT_PART_INSTALL}/opt"
+      rm "${SNAPCRAFT_PART_INSTALL}/${TARBALL}"
+
+    build-packages:
+      - dpkg
+      - tar
+      - wget
