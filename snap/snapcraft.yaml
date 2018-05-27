@@ -8,11 +8,12 @@ description: |
   million APIs every month.
 
 grade: stable
-confinement: strict
+confinement: classic
 
 apps:
   postman:
     command: opt/Postman/app/Postman
+    desktop: opt/Postman/Postman-snap.desktop
 
 parts:
   postman:
@@ -38,6 +39,18 @@ parts:
       mkdir -p "${SNAPCRAFT_PART_INSTALL}/opt"
       tar xf "${SNAPCRAFT_PART_INSTALL}/${TARBALL}" -C "${SNAPCRAFT_PART_INSTALL}/opt"
       rm "${SNAPCRAFT_PART_INSTALL}/${TARBALL}"
+
+      # Create a desktop file
+      echo "[Desktop Entry]
+      Version=1.0
+      Type=Application
+      Name=Postman
+      Comment=Postman Makes API Development Simple
+      Exec=/opt/Postman/app/Postman
+      Terminal=false
+      Icon=/opt/Postman/app/resources/app/assets/icon.png
+      Categories=Development;
+      " >> $SNAPCRAFT_PART_INSTALL/opt/Postman/Postman-snap.desktop
 
     build-packages:
       - dpkg
